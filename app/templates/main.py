@@ -7,6 +7,19 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/", response= HTMLResponse)
+@app.get("/", response_class= HTMLResponse)
+#Using async function to allow the server to process multiple requests and not wait for one at a time
+# Thus making our website run faster
 async def readRoot(request:Request):
     return templates.TemplateResponse("index.html",{"request": request})
+
+@app.post("/", response_class= HTMLResponse)
+async def getWeather(request= Request, city: str = Form(...)):
+    apiKey = 'add the API Key here'
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+    
+    weather = response.json()
+    return templates.TemplateResponse('index.html', {'request': request, 'weather': weather})
