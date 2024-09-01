@@ -7,5 +7,6 @@ app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
-
-print("Hello")
+@app.get("/", response= HTMLResponse)
+async def readRoot(request:Request):
+    return templates.TemplateResponse("index.html",{"request": request})
