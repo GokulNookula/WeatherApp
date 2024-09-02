@@ -13,11 +13,28 @@
     </form>
     
     {% if weather %}
-        <h2>Weather in {{ weather.name }}:</h2>
-        <p>Temperature: {{ weather.main.temp }}°C</p>
-        <p>Condition: {{ weather.weather[0].description }}</p>
+        <h2>Current Weather in {{ weather.name }}:</h2>
+        <p>Temperature: {{ current_temp }}°C</p>
+        <p>Condition: {{ condition }}</p>
+        <p>Clouds: {{ clouds }}%</p>
+        <p>Chance of Rainfall: {{ rainfall }} mm</p>
+        <p>Highest Temperature Today: {{ high_temp }}°C at {{ high_temp_time }}</p>
+        <p>Lowest Temperature Today: {{ low_temp }}°C at {{ low_temp_time }}</p>
+
+        <h2>5-Day Forecast:</h2>
+        <ul>
+            {% for day in forecast %}
+                <li>
+                    <strong>{{ day.date }}</strong>: 
+                    Temp: {{ day.temp }}°C, 
+                    Condition: {{ day.condition }}, 
+                    Rainfall: {{ day.rainfall }} mm
+                </li>
+            {% endfor %}
+        </ul>
     {% elif error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
+    
 </body>
 </html>
