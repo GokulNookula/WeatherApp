@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 import httpx
 from . import secret # Import the secret module for API Key
 import requests
+from datetime import datetime
 
 app = FastAPI()
 
@@ -32,10 +33,7 @@ async def getWeather(request: Request, city: str = Form(...)):
         forecastResponse = await client.get(forecastUrl)
 
     weather = weatherResponse.json()
-    forecast = forecastResponse.json()  # This line is now correctly using forecastResponse
-
-    print("Weather Response:", weather)  # Log weather data
-    print("Forecast Response:", forecast)  # Log forecast data
+    forecast = forecastResponse.json()
     
     # Handle errors from the API
     if weather.get("cod") != 200 or forecast.get("cod") != "200":
@@ -43,33 +41,38 @@ async def getWeather(request: Request, city: str = Form(...)):
         return templates.TemplateResponse('index.html', {'request': request, 'error': errorMessage})
     
     # Extract required data from weather and forecast responses
-    currentTemp = weather['main']['temp']
-    weatherCondition = weather['weather'][0]['description']
-    cloudCoverage = weather['clouds']['all']
+    currentTemp = weather.get('main', {}).get('temp', 'N/A')
+    weatherCondition = weather.get('weather', [{}])[0].get('description', 'N/A')
+    cloudCoverage = weather.get('clouds', {}).get('all', 'N/A')
     rainfallAmount = weather.get('rain', {}).get('1h', 0)  # Rainfall in the last hour, if available
 
-    # Find the highest and lowest temperatures in the 5-day forecast
-    highTemp, highTempTime = None, None
-    lowTemp, lowTempTime = None, None
+    # Prepare summary for 5-day forecast
+    forecastSummary = {}
     for entry in forecast['list']:
-        temp = entry['main']['temp']
-        if highTemp is None or temp > highTemp:
-            highTemp = temp
-            highTempTime = entry['dt_txt']
-        if lowTemp is None or temp < lowTemp:
-            lowTemp = temp
-            lowTempTime = entry['dt_txt']
+        date_str = entry['dt_txt']
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S').date()
 
-    # Prepare data for 5-day forecast
-    forecastData = []
-    for day in forecast['list']:
-        dayForecast = {
-            "date": day['dt_txt'],
-            "temp": day['main']['temp'],
-            "condition": day['weather'][0]['description'],
-            "rainfall": day.get('rain', {}).get('3h', 0),
+        if date_obj not in forecastSummary:
+            forecastSummary[date_obj] = {
+                "high_temp": entry['main']['temp_max'],
+                "low_temp": entry['main']['temp_min'],
+                "rain_chance": entry.get('pop', 0) * 100,  # Probability of precipitation
+            }
+        else:
+            forecastSummary[date_obj]['high_temp'] = max(forecastSummary[date_obj]['high_temp'], entry['main']['temp_max'])
+            forecastSummary[date_obj]['low_temp'] = min(forecastSummary[date_obj]['low_temp'], entry['main']['temp_min'])
+            forecastSummary[date_obj]['rain_chance'] = max(forecastSummary[date_obj]['rain_chance'], entry.get('pop', 0) * 100)
+
+    # Convert the forecast summary to a list and limit to the first 5 days
+    forecastData = [
+        {
+            "date": date.strftime('%A, %B %d, %Y'),
+            "high_temp": day['high_temp'],
+            "low_temp": day['low_temp'],
+            "rain_chance": day['rain_chance']
         }
-        forecastData.append(dayForecast)
+        for date, day in sorted(forecastSummary.items())[:5]
+    ]
 
     return templates.TemplateResponse(
         'index.html',
@@ -77,13 +80,11 @@ async def getWeather(request: Request, city: str = Form(...)):
             'request': request,
             'weather': weather,
             'currentTemp': currentTemp,
-            'highTemp': highTemp,
-            'highTempTime': highTempTime,
-            'lowTemp': lowTemp,
-            'lowTempTime': lowTempTime,
-            'rainfallAmount': rainfallAmount,
+            'highTemp': max(day['high_temp'] for day in forecastData),
+            'lowTemp': min(day['low_temp'] for day in forecastData),
+            'rainfallAmount': f"{rainfallAmount}%",  # Change to percentage format
             'weatherCondition': weatherCondition,
             'cloudCoverage': cloudCoverage,
-            'forecast': forecastData
+            'forecastSummary': forecastData,
         }
     )
