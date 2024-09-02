@@ -39,3 +39,22 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 4. ## Install the Required Libraries
 pip install -r requirements.txt
+
+5. ## Running the Application
+    ## Start the Uvicorn Server
+```sh
+uvicorn app.main:app --reload
+
+# The application will start on http://127.0.0.1:8000. You can visit this URL in your web browser to use the app.
+
+## Using the Application
+
+- Enter the name of the city you wish to check the weather for in the input box.
+- Alternatively, provide your latitude and longitude to get the weather for your current location.
+
+## API Key Configuration
+
+The application uses the OpenWeatherMap API to fetch weather data. Ensure you have an API key from OpenWeatherMap. Store the API key in a `secret.py` file within the `app` directory:
+
+```python
+api = "your_openweathermap_api_key"
