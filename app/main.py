@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 import httpx
 from . import secret  # Import the secret module for API Key
 import requests
@@ -10,6 +11,9 @@ app = FastAPI()
 
 # Set the directory for HTML templates
 templates = Jinja2Templates(directory="app/templates")
+
+# Mount the static directory to serve CSS files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 # Define the root endpoint that serves the main HTML page
