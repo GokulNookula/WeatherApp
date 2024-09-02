@@ -80,3 +80,24 @@ api = "your_openweathermap_api_key"
 
 Contributions to the project are welcome! Feel free to fork the repository and submit a pull request.
 
+## Tech Stack
+
+- **Frontend:**
+  - HTML, CSS (Flexbox), JavaScript
+
+- **Backend:**
+  - FastAPI, Uvicorn, Python
+
+- **HTTP Clients:**
+  - httpx (Asynchronous HTTP requests), requests
+
+- **Templating:**
+  - Jinja2
+
+- **APIs:**
+  - OpenWeatherMap API
+
+- **Development Tools:**
+  - Python Virtual Environment, Git
+
+
