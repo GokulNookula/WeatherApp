@@ -4,3 +4,4 @@ secret.py
 __pycache__/
 # Ignore the virtual environment directory
 venv/
+python.exe
