@@ -22,30 +22,35 @@ The following libraries are used in this project:
 ### Prerequisites
 Ensure you have Python 3.6 or higher installed on your machine.
 
-1. ### Installation
-**Clone the Repository**:
-```sh
-git clone https://github.com/your-username/weather-app.git
+### Installation
 
-2. ## Navigate to the Project Directory
+1. **Clone the Repository**:
+    ```sh
+    git clone https://github.com/your-username/weather-app.git
+    ```
 
-```sh
-cd weather-app
+2. **Navigate to the Project Directory**:
+    ```sh
+    cd weather-app
+    ```
 
-3. ## Create and Activate a Virtual Environment
-```sh
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+3. **Create and Activate a Virtual Environment**:
+    ```sh
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    ```
 
-4. ## Install the Required Libraries
-pip install -r requirements.txt
+4. **Install the Required Libraries**:
+    ```sh
+    pip install -r requirements.txt
+    ```
 
-5. ## Running the Application
-    ## Start the Uvicorn Server
-```sh
-uvicorn app.main:app --reload
-
-# The application will start on http://127.0.0.1:8000. You can visit this URL in your web browser to use the app.
+5. **Running the Application**:
+    **Start the Uvicorn Server**:
+    ```sh
+    uvicorn app.main:app --reload
+    ```
+    The application will start on [http://127.0.0.1:8000](http://127.0.0.1:8000). You can visit this URL in your web browser to use the app.
 
 ## Using the Application
 
@@ -58,3 +63,18 @@ The application uses the OpenWeatherMap API to fetch weather data. Ensure you ha
 
 ```python
 api = "your_openweathermap_api_key"
+
+## How It Works
+
+- **City-Based Search**: The user enters a city name. The app then makes an API call to OpenWeatherMap to retrieve current weather and forecast data for that city.
+- **Location-Based Search**: If the user provides latitude and longitude, the app retrieves weather data based on these coordinates.
+- **Rendering Data**: The retrieved data is processed and displayed in a user-friendly format, showing the current weather and a 5-day forecast.
+
+## Troubleshooting
+
+- If the weather data is not displayed, check the terminal for error messages. Ensure that the API key is correct and that your internet connection is active.
+- If you make changes to the code and want to see them in your browser, make sure to restart the Uvicorn server.
+
+## Contribution
+
+Contributions to the project are welcome! Feel free to fork the repository and submit a pull request.
