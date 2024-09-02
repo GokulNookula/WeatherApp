@@ -63,6 +63,7 @@ The application uses the OpenWeatherMap API to fetch weather data. Ensure you ha
 
 ```python
 api = "your_openweathermap_api_key"
+```
 
 ## How It Works
 
@@ -78,3 +79,4 @@ api = "your_openweathermap_api_key"
 ## Contribution
 
 Contributions to the project are welcome! Feel free to fork the repository and submit a pull request.
+
