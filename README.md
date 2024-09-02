@@ -23,11 +23,19 @@ The following libraries are used in this project:
 Ensure you have Python 3.6 or higher installed on your machine.
 
 1. ### Installation
-**Clone the Repository**: 
-    ```sh
-    git clone https://github.com/your-username/weather-app.git
+**Clone the Repository**:
+```sh
+git clone https://github.com/your-username/weather-app.git
 
 2. ## Navigate to the Project Directory
 
 ```sh
 cd weather-app
+
+3. ## Create and Activate a Virtual Environment
+```sh
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+4. ## Install the Required Libraries
+pip install -r requirements.txt
