@@ -1,39 +1,58 @@
 <!DOCTYPE html>
 <html lang="English">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, inital-scale=1.0">
-    <title>Weather App</title>
-</head>
-<body>
-    <h1>Welcome to the Weather App</h1>
-    <form method="post">
-        <input type="text" name="city" placeholder="Enter City" required>
-        <button type="Enter">Enter</button>
-    </form>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width-device-width, inital-scale=1.0">
+        <title>Weather App</title>
+        <script>
+            function getLocationAndSubmit() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        document.getElementById('lat').value = position.coords.latitude;
+                        document.getElementById('lon').value = position.coords.longitude;
+                        document.getElementById('locationForm').submit();
+                    }, function(error) {
+                        alert("Geolocation failed: " + error.message);
+                    });
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            }
+        </script>
+    </head>
     
-    {% if weather %}
-        <h2>Current Weather in {{ weather.name }}:</h2>
-        <p>Temperature: {{ currentTemp }}°C</p>
-        <p>Condition: {{ weatherCondition }}</p>
-        <p>Chance of Rainfall: {{ rainfallAmount }}</p>
-        <p>Highest Temperature in Forecast: {{ highTemp }}°C</p>
-        <p>Lowest Temperature in Forecast: {{ lowTemp }}°C</p>
-
-        <h2>Weather Forecast For the Next 5 Days:</h2>
-        <ul>
-            {% for day in forecastSummary %}
-                <li>
-                    {{ day.date }}: 
-                    High Temp: {{ day.high_temp }}°C / 
-                    Low Temp: {{ day.low_temp }}°C, 
-                    Chance of Rainfall overall on that day: {{ day.rain_chance }}%
-                </li>
-            {% endfor %}
-        </ul>
-    {% elif error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-
-</body>
+    <body>
+        <h1>Welcome to the Weather App</h1>
+        <form id="locationForm" method="post">
+            <input type="text" name="city" placeholder="Enter City">
+            <input type="hidden" id="lat" name="lat">
+            <input type="hidden" id="lon" name="lon">
+            <button type="submit">Enter</button>
+        </form>
+        <button onclick="getLocationAndSubmit()">Use My Location</button>
+        
+        {% if weather %}
+            <h2>Current Weather in {{ weather.name }}:</h2>
+            <p>Temperature: {{ currentTemp }}°C</p>
+            <p>Condition: {{ weatherCondition }}</p>
+            <p>Chance of Rainfall: {{ rainfallAmount }}</p>
+            <p>Highest Temperature in Forecast: {{ highTemp }}°C</p>
+            <p>Lowest Temperature in Forecast: {{ lowTemp }}°C</p>
+    
+            <h2>Weather Forecast For the Next 5 Days:</h2>
+            <ul>
+                {% for day in forecastSummary %}
+                    <li>
+                        {{ day.date }}: 
+                        High Temp: {{ day.highTemp }}°C / 
+                        Low Temp: {{ day.lowTemp }}°C, 
+                        Chance of Rainfall overall on that day: {{ day.rainChance }}%
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif error %}
+            <p style="color:red;">{{ error }}</p>
+        {% endif %}
+        
+    </body>
 </html>

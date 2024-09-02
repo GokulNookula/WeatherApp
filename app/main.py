@@ -17,16 +17,19 @@ async def readRoot(request:Request):
     return templates.TemplateResponse("index.html",{"request": request})
 
 @app.post("/", response_class= HTMLResponse)
-async def getWeather(request: Request, city: str = Form(...)):
-    city = city.strip().lower()
-    
-    if not city:  # If city is empty or only whitespace, don't make the API call
-        return templates.TemplateResponse('index.html', {'request': request})
-    
+async def getWeather(request: Request, city: str = Form(None), lat: str = Form(None), lon: str = Form(None)):
     apiKey = secret.api
 
-    weatherUrl = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric'
-    forecastUrl = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={apiKey}&units=metric'
+    if lat and lon:
+        # If latitude and longitude are provided, use them
+        weatherUrl = f'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={apiKey}&units=metric'
+        forecastUrl = f'http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={apiKey}&units=metric'
+    elif city:
+        city = city.strip().lower()
+        weatherUrl = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric'
+        forecastUrl = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={apiKey}&units=metric'
+    else:
+        return templates.TemplateResponse('index.html', {'request': request})
 
     async with httpx.AsyncClient() as client:
         weatherResponse = await client.get(weatherUrl)
@@ -37,7 +40,7 @@ async def getWeather(request: Request, city: str = Form(...)):
     
     # Handle errors from the API
     if weather.get("cod") != 200 or forecast.get("cod") != "200":
-        errorMessage = "The City that you Entered is Incorrect. Please try again."  # Custom error message
+        errorMessage = "The City or Location that you Entered is Incorrect. Please try again."  # Custom error message
         return templates.TemplateResponse('index.html', {'request': request, 'error': errorMessage})
     
     # Extract required data from weather and forecast responses
@@ -49,27 +52,27 @@ async def getWeather(request: Request, city: str = Form(...)):
     # Prepare summary for 5-day forecast
     forecastSummary = {}
     for entry in forecast['list']:
-        date_str = entry['dt_txt']
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S').date()
+        dateStr = entry['dt_txt']
+        dateObj = datetime.strptime(dateStr, '%Y-%m-%d %H:%M:%S').date()
 
-        if date_obj not in forecastSummary:
-            forecastSummary[date_obj] = {
-                "high_temp": entry['main']['temp_max'],
-                "low_temp": entry['main']['temp_min'],
-                "rain_chance": entry.get('pop', 0) * 100,  # Probability of precipitation
+        if dateObj not in forecastSummary:
+            forecastSummary[dateObj] = {
+                "highTemp": entry['main']['temp_max'],
+                "lowTemp": entry['main']['temp_min'],
+                "rainChance": entry.get('pop', 0) * 100,  # Probability of precipitation
             }
         else:
-            forecastSummary[date_obj]['high_temp'] = max(forecastSummary[date_obj]['high_temp'], entry['main']['temp_max'])
-            forecastSummary[date_obj]['low_temp'] = min(forecastSummary[date_obj]['low_temp'], entry['main']['temp_min'])
-            forecastSummary[date_obj]['rain_chance'] = max(forecastSummary[date_obj]['rain_chance'], entry.get('pop', 0) * 100)
+            forecastSummary[dateObj]['highTemp'] = max(forecastSummary[dateObj]['highTemp'], entry['main']['temp_max'])
+            forecastSummary[dateObj]['lowTemp'] = min(forecastSummary[dateObj]['lowTemp'], entry['main']['temp_min'])
+            forecastSummary[dateObj]['rainChance'] = max(forecastSummary[dateObj]['rainChance'], entry.get('pop', 0) * 100)
 
     # Convert the forecast summary to a list and limit to the first 5 days
     forecastData = [
         {
             "date": date.strftime('%A, %B %d, %Y'),
-            "high_temp": day['high_temp'],
-            "low_temp": day['low_temp'],
-            "rain_chance": day['rain_chance']
+            "highTemp": day['highTemp'],
+            "lowTemp": day['lowTemp'],
+            "rainChance": day['rainChance']
         }
         for date, day in sorted(forecastSummary.items())[:5]
     ]
@@ -80,8 +83,8 @@ async def getWeather(request: Request, city: str = Form(...)):
             'request': request,
             'weather': weather,
             'currentTemp': currentTemp,
-            'highTemp': max(day['high_temp'] for day in forecastData),
-            'lowTemp': min(day['low_temp'] for day in forecastData),
+            'highTemp': max(day['highTemp'] for day in forecastData),
+            'lowTemp': min(day['lowTemp'] for day in forecastData),
             'rainfallAmount': f"{rainfallAmount}%",  # Change to percentage format
             'weatherCondition': weatherCondition,
             'cloudCoverage': cloudCoverage,
