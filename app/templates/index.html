@@ -8,14 +8,32 @@
 <body>
     <h1>Welcome to the Weather App</h1>
     <form method="post">
-        <input type="text" name="City" placeholder="Enter City" required>
-        <button type="Enter">Get Weather</button>
+        <input type="text" name="city" placeholder="Enter City" required>
+        <button type="Enter">Enter</button>
     </form>
     
     {% if weather %}
-        <h2>Weather in {{ weather.name }}:</h2>
-        <p>Temperature: {{ weather.main.temp }}°C</p>
-        <p>Condition: {{ weather.weather[0].description }}</p>
+        <h2>Current Weather in {{ weather.name }}:</h2>
+        <p>Temperature: {{ currentTemp }}°C</p>
+        <p>Condition: {{ weatherCondition }}</p>
+        <p>Chance of Rainfall: {{ rainfallAmount }}</p>
+        <p>Highest Temperature in Forecast: {{ highTemp }}°C</p>
+        <p>Lowest Temperature in Forecast: {{ lowTemp }}°C</p>
+
+        <h2>Weather Forecast For the Next 5 Days:</h2>
+        <ul>
+            {% for day in forecastSummary %}
+                <li>
+                    {{ day.date }}: 
+                    High Temp: {{ day.high_temp }}°C / 
+                    Low Temp: {{ day.low_temp }}°C, 
+                    Chance of Rainfall overall on that day: {{ day.rain_chance }}%
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif error %}
+        <p style="color:red;">{{ error }}</p>
     {% endif %}
+
 </body>
 </html>
