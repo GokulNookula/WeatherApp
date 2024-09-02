@@ -5,4 +5,17 @@
     <meta name="viewport" content="width-device-width, inital-scale=1.0">
     <title>Weather App</title>
 </head>
+<body>
+    <h1>Welcome to the Weather App</h1>
+    <form method="post">
+        <input type="text" name="City" placeholder="Enter City" required>
+        <button type="Enter">Get Weather</button>
+    </form>
+    
+    {% if weather %}
+        <h2>Weather in {{ weather.name }}:</h2>
+        <p>Temperature: {{ weather.main.temp }}°C</p>
+        <p>Condition: {{ weather.weather[0].description }}</p>
+    {% endif %}
+</body>
 </html>
