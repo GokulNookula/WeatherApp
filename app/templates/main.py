@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+import httpx
+import secret # Import the secret module for API Key
 import requests
 
 app = FastAPI()
@@ -15,8 +17,8 @@ async def readRoot(request:Request):
 
 @app.post("/", response_class= HTMLResponse)
 async def getWeather(request= Request, city: str = Form(...)):
-    apiKey = 'add the API Key here'
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
+    apiKey = secret.api
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric'
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
